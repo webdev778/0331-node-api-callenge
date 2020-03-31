@@ -1,38 +1,33 @@
-module.exports = {
-  buildObj,
-  getKeyPath
-}
-
 const _trim = props => props.filter(p => !!p)
 
-const _arrayToJson = (keys, jsonObj = {}) => {
-  if (keys.length === 0) return _body
-  const key = keys[0]
-  keys.shift()
-  jsonObj[key] = _arrayToJson(keys, jsonObj[key])
-  return jsonObj
+/**
+ * @param {Array} path - json key array.
+ * @param {JSON Object} nested - nested value.
+ * Return new json object with nested value
+ * For instance, path => ['a', 'b', 'c'], nested => { body: 1 }
+ * it will be { 'a' : { 'b' : { 'c' : { body : 1 } } } }
+ */
+const _makeJson = (path, nested) => {
+  let obj = {}
+  let _p = obj
+  let i
+
+  for (i = 0; i < path.length - 1; i++) {
+    _p[path[i]] = {}
+    _p = _p[path[i]]
+  }
+  _p[path[i]] = nested
+
+  return obj
 }
 
-let _body = {}
-function buildObj (params, body) {
-  let result = null
-  _body = body
+const buildJSON = (path, body) => path
+  ? _makeJson(_trim(path.split('/')), body)
+  : null
 
-  if (params) {
-    const props = params.split('/')
-    result = _arrayToJson(_trim(props), {})
-  }
+const getKeyPath = params => params ? _trim(params.split('/')).join('.') : null
 
-  return result
-}
-
-function getKeyPath (params) {
-  let result = null
-
-  if (params) {
-    const props = _trim(params.split('/'))
-    result = props.join('.')
-  }
-
-  return result
+module.exports = {
+  buildJSON,
+  getKeyPath
 }
