@@ -3,11 +3,7 @@ module.exports = {
   getKeyPath
 }
 
-const _trimProps = (props) => {
-  if (!props.length) return
-  if (props[0] === '') props.shift()
-  if (props.length > 0 && props[props.length - 1] === '') props.pop()
-}
+const _trim = props => props.filter(p => !!p)
 
 const _arrayToJson = (keys, jsonObj = {}) => {
   if (keys.length === 0) return _body
@@ -24,8 +20,7 @@ function buildObj (params, body) {
 
   if (params) {
     const props = params.split('/')
-    _trimProps(props)
-    result = _arrayToJson(props, {})
+    result = _arrayToJson(_trim(props), {})
   }
 
   return result
@@ -35,8 +30,7 @@ function getKeyPath (params) {
   let result = null
 
   if (params) {
-    const props = params.split('/')
-    _trimProps(props)
+    const props = _trim(params.split('/'))
     result = props.join('.')
   }
 
